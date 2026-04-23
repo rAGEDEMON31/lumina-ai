@@ -1,0 +1,41 @@
+{
+  "entities": {
+    "Project": {
+      "title": "Project",
+      "description": "An interior design project containing canvas data and metadata.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "canvasData": { "type": "string", "description": "JSON string of fabric.js canvas state" },
+        "thumbnail": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "name", "canvasData"]
+    },
+    "SharedLink": {
+      "title": "SharedLink",
+      "description": "A shareable link pointing to a project or AI redesign.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "projectId": { "type": "string" },
+        "redesignUrl": { "type": "string" },
+        "createdBy": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  "firestore": {
+    "/projects/{projectId}": {
+      "schema": "Project",
+      "description": "User design projects"
+    },
+    "/shares/{shareId}": {
+      "schema": "SharedLink",
+      "description": "Publicly shared designs"
+    }
+  }
+}

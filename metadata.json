@@ -1,0 +1,6 @@
+{
+  "name": "Lumina+",
+  "description": "Premium interior design application with 2D canvas, AI redesigns, and AR visualization.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": []
+}

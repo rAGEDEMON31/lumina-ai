@@ -1,0 +1,50 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper Functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_-]+$');
+    }
+
+    function isValidProject(data) {
+      return data.keys().hasAll(['userId', 'name', 'canvasData']) &&
+             data.userId == request.auth.uid &&
+             data.name is string && data.name.size() <= 100 &&
+             data.canvasData is string && data.canvasData.size() <= 1048576; // 1MB limit for safety
+    }
+
+    // Projects Collection
+    match /projects/{projectId} {
+      allow get: if isOwner(resource.data.userId);
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidProject(request.resource.data) && isValidId(projectId);
+      allow update: if isOwner(resource.data.userId) && 
+                      isValidProject(request.resource.data) &&
+                      request.resource.data.userId == resource.data.userId;
+      allow delete: if isOwner(resource.data.userId);
+    }
+
+    // Shares Collection (Publicly readable, but limited writes)
+    match /shares/{shareId} {
+      allow get: if true; // Shared links are public
+      allow list: if false; // No public listing of shared links
+      allow create: if isSignedIn() && 
+                    request.resource.data.createdBy == request.auth.uid &&
+                    isValidId(shareId);
+      allow delete: if isSignedIn() && resource.data.createdBy == request.auth.uid;
+    }
+  }
+}
