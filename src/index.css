@@ -1,37 +1,74 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@100;200;300;400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --color-brand: var(--color-indigo-600);
+  --font-serif: "Cormorant Garamond", Georgia, serif;
+  --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --color-brand: #c19a6b; /* Warm Brass */
+  --color-luxury-cream: #fdfcf9;
+  --color-luxury-ink: #141414;
+  --color-luxury-paper: #f7f4f0;
+  --color-luxury-stone: #e8e4df;
 }
 
 :root {
-  --foreground-rgb: 15, 23, 42; /* slate-900 */
-  --background-start-rgb: 248, 250, 252; /* slate-50 */
-  --background-end-rgb: 255, 255, 255;
+  --foreground-rgb: 20, 20, 20;
+  --background-start-rgb: 253, 252, 249;
+  --background-end-rgb: 247, 244, 240;
 }
 
 body {
-  @apply selection:bg-indigo-100 selection:text-indigo-900 text-slate-900 bg-slate-50;
+  @apply selection:bg-brand/20 selection:text-brand text-luxury-ink bg-luxury-cream font-sans antialiased;
 }
 
-/* Premium shadows from theme */
-.shadow-clean {
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+/* Texture Overlay */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("https://www.transparenttextures.com/patterns/natural-paper.png");
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 9999;
 }
 
-.shadow-canvas {
-  box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.15);
+/* Luxury Editorial Typography */
+.text-serif-display {
+  @apply font-serif italic font-medium tracking-tight;
 }
 
-/* Canvas Dot Pattern */
+.text-caps-label {
+  @apply text-[9px] uppercase tracking-[0.3em] font-bold text-slate-400;
+}
+
+/* Refined Elements */
+.shadow-luxury {
+  box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.05), 0 20px 40px -15px rgba(0, 0, 0, 0.03);
+}
+
+.btn-luxury {
+  @apply px-10 py-5 rounded-full text-[10px] uppercase font-bold tracking-[0.2em] transition-all duration-700 relative overflow-hidden;
+}
+
+/* Canvas Dot Pattern - Warmer */
 .bg-dots {
-  background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+  background-image: radial-gradient(#d6d3d1 1px, transparent 1px);
   background-size: 24px 24px;
 }
 
 .canvas-container {
   @apply !mx-auto !my-0 rounded-[2rem];
+}
+
+/* Hide scrollbar */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 

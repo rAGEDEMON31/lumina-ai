@@ -6,57 +6,94 @@ import { ChevronLeft, Camera, Box, RotateCcw, Maximize, Sparkles } from 'lucide-
 import { Link } from 'react-router-dom';
 
 const SofaModel = () => {
-  // Simulating a sofa with a group of boxes since we don't have a GLB
   return (
     <group position={[0, -0.5, 0]}>
-      {/* Base */}
       <mesh position={[0, 0.25, 0]}>
         <boxGeometry args={[2, 0.5, 1]} />
-        <meshStandardMaterial color="#444" roughness={0.8} />
+        <meshStandardMaterial color="#334155" roughness={0.8} />
       </mesh>
-      {/* Backrest */}
       <mesh position={[0, 0.75, -0.4]}>
         <boxGeometry args={[2, 0.75, 0.2]} />
-        <meshStandardMaterial color="#444" roughness={0.8} />
+        <meshStandardMaterial color="#334155" roughness={0.8} />
       </mesh>
-      {/* Left Arm */}
       <mesh position={[-0.9, 0.5, 0]}>
         <boxGeometry args={[0.2, 0.5, 1]} />
-        <meshStandardMaterial color="#333" />
+        <meshStandardMaterial color="#1e293b" />
       </mesh>
-      {/* Right Arm */}
       <mesh position={[0.9, 0.5, 0]}>
         <boxGeometry args={[0.2, 0.5, 1]} />
-        <meshStandardMaterial color="#333" />
+        <meshStandardMaterial color="#1e293b" />
       </mesh>
     </group>
   );
 };
 
-const ARScene = () => {
+const ChairModel = () => {
+  return (
+    <group position={[0, -0.5, 0]}>
+      <mesh position={[0, 0.4, 0]}>
+        <boxGeometry args={[0.8, 0.1, 0.8]} />
+        <meshStandardMaterial color="#4f46e5" />
+      </mesh>
+      <mesh position={[0, 0.8, -0.35]}>
+        <boxGeometry args={[0.8, 0.8, 0.1]} />
+        <meshStandardMaterial color="#4f46e5" />
+      </mesh>
+      {[[-0.3, 0.15, 0.3], [0.3, 0.15, 0.3], [-0.3, 0.15, -0.3], [0.3, 0.15, -0.3]].map((pos, i) => (
+        <mesh key={i} position={pos}>
+          <cylinderGeometry args={[0.05, 0.05, 0.4]} />
+          <meshStandardMaterial color="#1e293b" />
+        </mesh>
+      ))}
+    </group>
+  );
+};
+
+const LampModel = () => {
+  return (
+    <group position={[0, -0.5, 0]}>
+      <mesh position={[0, 0.05, 0]}>
+        <cylinderGeometry args={[0.3, 0.3, 0.1]} />
+        <meshStandardMaterial color="#334155" />
+      </mesh>
+      <mesh position={[0, 1, 0]}>
+        <cylinderGeometry args={[0.02, 0.02, 2]} />
+        <meshStandardMaterial color="#334155" />
+      </mesh>
+      <mesh position={[0, 1.8, 0]}>
+        <coneGeometry args={[0.4, 0.6, 32]} />
+        <meshStandardMaterial color="#fcd34d" emissive="#fcd34d" emissiveIntensity={0.5} />
+      </mesh>
+    </group>
+  );
+};
+
+const ARScene = ({ modelType }) => {
   return (
     <>
       <PerspectiveCamera makeDefault position={[0, 2, 5]} />
       <OrbitControls makeDefault minPolarAngle={0} maxPolarAngle={Math.PI / 1.75} />
       
-      <ambientLight intensity={0.5} />
-      <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} />
-      <pointLight position={[-10, -10, -10]} />
+      <ambientLight intensity={0.7} />
+      <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} castShadow />
+      <pointLight position={[-10, -10, -10]} intensity={0.5} />
       
       <Suspense fallback={<Html center>Loading Model...</Html>}>
         <Center>
-          <SofaModel />
+          {modelType === 'sofa' && <SofaModel />}
+          {modelType === 'chair' && <ChairModel />}
+          {modelType === 'lamp' && <LampModel />}
         </Center>
       </Suspense>
 
       <ContactShadows 
         position={[0, -0.5, 0]} 
-        opacity={0.4} 
+        opacity={0.6} 
         scale={10} 
-        blur={2.5} 
+        blur={2} 
         far={4} 
       />
-      <Environment preset="city" />
+      <Environment preset="apartment" />
     </>
   );
 };
@@ -66,6 +103,7 @@ export default function ARView() {
   const [hasCamera, setHasCamera] = useState(false);
   const [error, setError] = useState(null);
   const [isStarting, setIsStarting] = useState(false);
+  const [modelType, setModelType] = useState('sofa');
 
   async function startCamera() {
     setIsStarting(true);
@@ -179,7 +217,7 @@ export default function ARView() {
       {/* 3D Canvas Overlay */}
       <div className="absolute inset-0 pointer-events-auto">
         <Canvas shadows alpha>
-          <ARScene />
+          <ARScene modelType={modelType} />
         </Canvas>
       </div>
 
@@ -198,7 +236,19 @@ export default function ARView() {
           </div>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-6">
+          <div className="flex justify-center flex-wrap gap-3 pointer-events-auto">
+            {['sofa', 'chair', 'lamp'].map(type => (
+              <button 
+                key={type}
+                onClick={() => setModelType(type)}
+                className={`px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${modelType === type ? 'bg-indigo-600 text-white' : 'bg-white/10 backdrop-blur-md text-white border border-white/20'}`}
+              >
+                {type}
+              </button>
+            ))}
+          </div>
+
           <div className="flex justify-center space-x-4">
              <button className="pointer-events-auto p-4 bg-white/10 backdrop-blur-md rounded-2xl text-white border border-white/20">
                <RotateCcw size={20} />

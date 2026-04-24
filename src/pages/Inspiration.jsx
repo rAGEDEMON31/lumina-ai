@@ -27,11 +27,18 @@ export default function Inspiration() {
   // Function to fetch dynamic images based on category
   const fetchImages = async (category) => {
     const accessKey = import.meta.env.VITE_UNSPLASH_ACCESS_KEY;
+    
+    // Better fallback behavior using source.unsplash.com pattern or high-quality static ids
+    const fallbackIds = [
+      '1616486338812-3dadae4b4ace', '1524758631624-e2822e304c36', '1618221195710-dd6b41faaea6',
+      '1515542706656-8e6ef17a1521', '1566665797739-1674de7a421a', '1556911220-e15b29be8c8f',
+      '1524230507669-5ff97982bb5e', '1493663212050-b7dc42a1d0ee', '1616486338812-3dadae4b4ace'
+    ];
+
     if (!accessKey || accessKey === 'YOUR_KEY_HERE') {
-      // Fallback behavior if key is missing
       const results = Array.from({ length: 12 }).map((_, i) => ({
         id: `${category}-${i}`,
-        url: `https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&q=80&w=800&sig=${i}`
+        url: `https://images.unsplash.com/photo-${fallbackIds[i % fallbackIds.length]}?auto=format&fit=crop&q=80&w=800&sig=${i}`
       }));
       setGallery(results);
       return;
@@ -40,7 +47,7 @@ export default function Inspiration() {
     setLoading(true);
     try {
       const response = await fetch(
-        `https://api.unsplash.com/search/photos?query=${category} interior design&client_id=${accessKey}&per_page=16`
+        `https://api.unsplash.com/search/photos?query=${category} architectural interior photography&client_id=${accessKey}&per_page=16&orientation=portrait`
       );
       const data = await response.json();
       const results = data.results.map(img => ({
@@ -69,15 +76,16 @@ export default function Inspiration() {
   return (
     <div className="max-w-[1600px] mx-auto px-6 py-12">
       {/* Search Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-16">
-        <div className="max-w-xl">
-           <h1 className="text-4xl font-bold text-slate-900 tracking-tight mb-4">Design Inspiration</h1>
-           <p className="text-slate-500 font-medium leading-relaxed">
-             Explore 30+ curated categories across Living, Bedroom, and Kitchen. Your digital vision board for a more beautiful home.
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-12 mb-20">
+        <div className="max-w-2xl">
+           <span className="text-luxury-label mb-4 block">Visual Board</span>
+           <h1 className="text-5xl md:text-7xl text-luxury-display text-luxury-ink mb-6">Gallery of Inspiration</h1>
+           <p className="text-slate-500 font-medium leading-relaxed max-w-xl">
+             Explore over 30 bespoke architectural and interior categories. Curate your vision from thousands of professionally designed spaces.
            </p>
         </div>
         
-        <div className="flex items-center gap-4 bg-white p-2 rounded-2xl border border-slate-100 shadow-sm">
+        <div className="flex items-center gap-2 bg-white p-2 rounded-[2rem] border border-slate-100 shadow-sm">
            {Object.keys(CATEGORIES).map(tab => (
              <button
               key={tab}
@@ -85,8 +93,8 @@ export default function Inspiration() {
                 setActiveTab(tab);
                 setActiveCategory(CATEGORIES[tab][0]);
               }}
-              className={`px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest transition-all ${
-                activeTab === tab ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-100' : 'text-slate-400 hover:text-slate-600'
+              className={`px-8 py-4 rounded-[1.5rem] text-[10px] font-bold uppercase tracking-widest transition-all ${
+                activeTab === tab ? 'bg-luxury-ink text-white shadow-xl' : 'text-slate-400 hover:text-luxury-ink'
               }`}
              >
                {tab}
@@ -96,16 +104,16 @@ export default function Inspiration() {
       </div>
 
       {/* Category Ribbon */}
-      <div className="mb-12 overflow-x-auto pb-4 hide-scrollbar">
-        <div className="flex gap-3 min-w-max">
+      <div className="mb-20 overflow-x-auto pb-6 hide-scrollbar">
+        <div className="flex gap-4 min-w-max px-2">
            {CATEGORIES[activeTab].map(cat => (
              <button
               key={cat}
               onClick={() => setActiveCategory(cat)}
-              className={`px-5 py-3 rounded-full text-xs font-bold whitespace-nowrap border transition-all ${
+              className={`px-8 py-4 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] whitespace-nowrap border transition-all ${
                 activeCategory === cat 
-                  ? 'bg-slate-900 text-white border-slate-900 scale-105' 
-                  : 'bg-white text-slate-500 border-slate-100 hover:border-slate-300'
+                  ? 'bg-brand text-white border-brand scale-105 shadow-lg shadow-brand/20' 
+                  : 'bg-white text-slate-400 border-slate-100 hover:border-brand/30 hover:text-brand'
               }`}
              >
                {cat}
@@ -116,55 +124,55 @@ export default function Inspiration() {
 
       {/* Pinterest Masonry Grid */}
       {loading ? (
-        <div className="flex flex-col items-center justify-center min-h-[400px]">
-           <Loader2 className="animate-spin text-indigo-600 mb-4" size={40} />
-           <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Curating your gallery...</p>
+        <div className="flex flex-col items-center justify-center min-h-[500px]">
+           <Loader2 className="animate-spin text-brand mb-8" size={48} strokeWidth={1.5} />
+           <p className="text-slate-300 font-bold uppercase tracking-[0.3em] text-[10px]">Curating your bespoke gallery...</p>
         </div>
       ) : (
-        <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6">
+        <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-8 space-y-8">
           <AnimatePresence>
             {gallery.map((item, i) => (
               <motion.div
                 key={item.id}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.4, delay: (i % 8) * 0.05 }}
-                className="group relative rounded-[2.5rem] overflow-hidden bg-white border border-slate-100 break-inside-avoid shadow-sm hover:shadow-2xl transition-all"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: (i % 8) * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                className="group relative rounded-[3rem] overflow-hidden bg-white border border-slate-50 break-inside-avoid shadow-clean hover:shadow-luxury transition-all duration-700"
               >
                 <img 
                   src={item.url} 
                   alt={activeCategory} 
-                  className="w-full h-auto transition-transform duration-1000 group-hover:scale-110"
+                  className="w-full h-auto transition-transform duration-[2000ms] group-hover:scale-110"
                   referrerPolicy="no-referrer"
                   loading="lazy"
                 />
                 
                 {/* Overlay actions */}
-                <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-between p-8 backdrop-blur-[2px]">
+                <div className="absolute inset-0 bg-luxury-ink/40 opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col justify-between p-10 backdrop-blur-[4px]">
                    <div className="flex justify-end">
                       <button 
                         onClick={() => toggleFavorite(item.id)}
-                        className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${
-                          favorites.has(item.id) ? 'bg-red-500 text-white' : 'bg-white/20 backdrop-blur-md text-white hover:bg-white'
+                        className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-500 ${
+                          favorites.has(item.id) ? 'bg-red-500 text-white' : 'bg-white/10 backdrop-blur-md text-white hover:bg-brand'
                         }`}
                       >
-                         <Heart size={20} fill={favorites.has(item.id) ? "currentColor" : "none"} />
+                         <Heart size={24} fill={favorites.has(item.id) ? "currentColor" : "none"} strokeWidth={1.5} />
                       </button>
                    </div>
                    
-                   <div className="space-y-4">
-                      <div className="flex items-center gap-2 text-white/60 text-[10px] font-bold uppercase tracking-widest">
-                         <Zap size={14} /> AI Curated Style
+                   <div className="space-y-6">
+                      <div className="flex items-center gap-3 text-white/70 text-[9px] font-bold uppercase tracking-[0.2em]">
+                         <Zap size={14} className="text-brand" /> AI Aesthetic curation
                       </div>
-                      <h3 className="text-xl font-bold text-white tracking-tight leading-tight">
-                        {activeCategory} {activeTab} Concept
+                      <h3 className="text-3xl text-luxury-display text-white italic leading-tight">
+                        {activeCategory}
                       </h3>
-                      <div className="flex gap-2">
-                         <button className="flex-1 bg-white text-slate-900 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-indigo-50 transition-colors">
-                            Download
+                      <div className="flex gap-3">
+                         <button className="flex-1 bg-white text-luxury-ink py-4 rounded-2xl text-[10px] font-bold uppercase tracking-widest hover:bg-brand hover:text-white transition-all duration-300">
+                            Save Concept
                          </button>
-                         <button className="w-12 h-12 bg-white/20 backdrop-blur-md text-white rounded-xl flex items-center justify-center hover:bg-white/30 transition-all">
-                            <Share2 size={18} />
+                         <button className="w-14 h-14 bg-white/10 backdrop-blur-md text-white rounded-2xl flex items-center justify-center hover:bg-white hover:text-luxury-ink transition-all duration-300">
+                            <Share2 size={20} strokeWidth={1.5} />
                          </button>
                       </div>
                    </div>

@@ -21,73 +21,101 @@ const Navbar = () => {
   const { user } = useAuth();
 
   const navLinks = [
-    { name: 'Dashboard', path: '/dashboard', icon: Layout },
-    { name: 'Canvas Designer', path: '/canvas', icon: Box },
-    { name: 'AI Redesign', path: '/ai-design', icon: Sparkles },
-    { name: 'Inspiration', path: '/inspiration', icon: ImageIcon },
+    { name: 'Studio', path: '/dashboard' },
+    { name: 'Canvas', path: '/canvas' },
+    { name: 'Atelier', path: '/ai-design' },
+    { name: 'Curations', path: '/inspiration' },
   ];
 
   const isActive = (path) => location.pathname === path;
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-slate-100 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16 items-center">
-          <Link to="/" className="flex items-center space-x-2">
-            <span className="text-xl font-bold tracking-tight text-indigo-600 uppercase">LUMINA<span className="text-slate-300">+</span></span>
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-luxury-cream/80 backdrop-blur-xl border-b border-luxury-stone/20">
+      <div className="max-w-[1800px] mx-auto px-8 md:px-16">
+        <div className="flex justify-between h-24 items-center">
+          <Link to="/" className="flex items-center space-x-2 group">
+            <span className="text-2xl font-bold tracking-[0.4em] text-luxury-ink uppercase group-hover:text-brand transition-colors">
+              LUMINA<span className="text-brand">+</span>
+            </span>
           </Link>
 
           {/* Desktop Nav */}
-          <div className="hidden md:flex items-center space-x-6">
-            {navLinks.map((link) => (
-              <Link
-                key={link.path}
-                to={link.path}
-                className={`text-sm font-medium transition-colors hover:text-slate-900 ${
-                  isActive(link.path) ? 'text-indigo-600' : 'text-slate-500'
-                }`}
-              >
-                {link.name}
-              </Link>
-            ))}
+          <div className="hidden md:flex items-center space-x-12">
+            <div className="flex items-center space-x-10">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  className={`text-[9px] font-bold uppercase tracking-[0.2em] transition-all hover:text-brand ${
+                    isActive(link.path) ? 'text-brand' : 'text-slate-400'
+                  }`}
+                >
+                  {link.name}
+                </Link>
+              ))}
+            </div>
             
-            <div className="w-px h-4 bg-slate-100 mx-2" />
+            <div className="w-px h-6 bg-luxury-stone/30" />
 
             {user ? (
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-8">
                 <button 
                   onClick={logout}
-                  className="text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors"
+                  className="text-[9px] font-bold text-slate-300 hover:text-red-400 transition-colors uppercase tracking-[0.2em]"
                 >
-                  SIGN OUT
+                  Leave
                 </button>
-                <div className="w-8 h-8 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600">
-                   {user.photoURL ? (
-                     <img src={user.photoURL} className="w-8 h-8 rounded-full" alt="avatar" />
-                   ) : (
-                     <User size={16} />
-                   )}
-                </div>
+                <Link to="/dashboard" className="w-10 h-10 rounded-full bg-luxury-stone/20 p-[2px] hover:scale-110 transition-transform">
+                   <div className="w-full h-full rounded-full overflow-hidden bg-white">
+                      {user.photoURL ? (
+                        <img src={user.photoURL} className="w-full h-full object-cover" alt="avatar" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-brand"><User size={16} /></div>
+                      )}
+                   </div>
+                </Link>
               </div>
             ) : (
               <Link 
                 to="/login" 
-                className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 transition-colors"
+                className="text-[10px] font-bold uppercase tracking-[0.3em] text-luxury-ink hover:text-brand transition-colors"
               >
-                <LogIn size={16} />
-                <span>SIGN IN</span>
+                Sign In
               </Link>
             )}
           </div>
 
           {/* Mobile Menu Button */}
           <div className="md:hidden">
-            <button onClick={() => setIsOpen(!isOpen)} className="p-2 text-gray-500">
-              {isOpen ? <X size={24} /> : <Menu size={24} />}
+            <button onClick={() => setIsOpen(!isOpen)} className="text-luxury-ink">
+              {isOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
           </div>
         </div>
       </div>
+
+      {/* Mobile Nav Overlay */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="md:hidden absolute top-24 left-0 right-0 bg-luxury-cream border-b border-luxury-stone p-8 space-y-8 shadow-luxury"
+          >
+            {navLinks.map((link) => (
+              <Link
+                key={link.path}
+                to={link.path}
+                onClick={() => setIsOpen(false)}
+                className="block text-sm font-bold uppercase tracking-[0.2em] text-luxury-ink"
+              >
+                {link.name}
+              </Link>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 };
@@ -102,8 +130,8 @@ const PageWrapper = ({ children }) => (
   <motion.div
     initial={{ opacity: 0, y: 10 }}
     animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.4, ease: 'easeOut' }}
-    className="min-h-screen pt-16 bg-white"
+    transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+    className="min-h-screen pt-20 bg-luxury-cream"
   >
     {children}
   </motion.div>

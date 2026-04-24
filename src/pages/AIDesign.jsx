@@ -88,49 +88,58 @@ export default function AIDesign() {
   const styles = ['Modern Minimal', 'Industrial Loft', 'Scandinavian', 'Luxury Classic', 'Japandi', 'Bohemian'];
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-12">
-      <div className="mb-12">
-        <h1 className="text-3xl font-bold text-slate-900 mb-2 flex items-center">
-          <Sparkles className="mr-2 text-indigo-600" /> AI Room Redesign
+    <div className="max-w-[1400px] mx-auto px-6 md:px-16 py-12 md:py-20">
+      <div className="mb-12 md:mb-20">
+        <div className="flex items-center gap-4 mb-6">
+           <span className="w-12 h-[1px] bg-brand"></span>
+           <span className="text-caps-label text-brand">Generative Studio</span>
+        </div>
+        <h1 className="text-5xl md:text-7xl text-serif-display text-luxury-ink mb-6">
+          AI Atelier
         </h1>
-        <p className="text-slate-500 font-medium">Upload a photo of your room and let our AI transform it instantly.</p>
+        <p className="text-slate-400 font-medium max-w-sm italic serif">Reimagining spatial reality through curated machine intelligence.</p>
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-12">
-        {/* Left: Upload & Config */}
-        <div className="space-y-8">
-          <div className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm">
-            <h3 className="font-bold text-slate-900 mb-6 flex items-center text-sm uppercase tracking-widest"><CheckCircle2 className="mr-2 text-green-500" size={18} /> Step 1: Upload Photo</h3>
-            <label className="group relative flex flex-col items-center justify-center w-full h-64 border-2 border-dashed border-slate-200 rounded-[2rem] cursor-pointer hover:border-indigo-400 hover:bg-slate-50 transition-all overflow-hidden">
+      <div className="grid lg:grid-cols-2 gap-12 md:gap-20 items-start">
+        {/* Left: Configuration */}
+        <div className="space-y-12 md:space-y-16">
+          <section>
+            <h3 className="text-caps-label text-slate-300 mb-8 flex items-center">
+              <span className="w-6 h-6 rounded-full border border-slate-200 flex items-center justify-center text-[8px] mr-3">01</span>
+              Source Inspiration
+            </h3>
+            <label className="group relative flex flex-col items-center justify-center w-full aspect-[16/10] bg-luxury-paper border border-luxury-stone rounded-[3rem] cursor-pointer overflow-hidden shadow-luxury">
               {preview ? (
-                <img src={preview} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                <img src={preview} className="w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 transition-all duration-700" referrerPolicy="no-referrer" />
               ) : (
-                <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                  <div className="w-12 h-12 bg-slate-100 rounded-2xl flex items-center justify-center mb-4 text-slate-300 group-hover:text-indigo-600 transition-colors">
+                <div className="flex flex-col items-center justify-center text-center p-12">
+                  <div className="w-16 h-16 bg-white border border-luxury-stone rounded-2xl flex items-center justify-center mb-6 text-slate-300 group-hover:text-brand group-hover:scale-110 transition-all">
                     <Upload size={24} />
                   </div>
-                  <p className="mb-2 text-sm text-slate-500 font-medium">Click to upload or drag and drop</p>
-                  <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">PNG, JPG up to 10MB</p>
+                  <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Click to import spatial data</p>
                 </div>
               )}
               <input type="file" className="hidden" onChange={handleFileChange} accept="image/*" />
             </label>
             {preview && (
-              <button onClick={() => setPreview(null)} className="mt-4 text-[10px] font-bold text-red-500 uppercase tracking-widest flex items-center">
-                 <RefreshCw size={12} className="mr-1" /> Reset Photo
+              <button onClick={() => setPreview(null)} className="mt-6 text-[9px] font-bold text-slate-400 uppercase tracking-widest hover:text-red-400 transition-colors flex items-center gap-2">
+                 <RefreshCw size={10} /> Reset source
               </button>
             )}
-          </div>
+          </section>
 
-          <div className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm">
-            <h3 className="font-bold text-slate-900 mb-6 flex items-center text-sm uppercase tracking-widest"><CheckCircle2 className="mr-2 text-green-500" size={18} /> Step 2: Choose Style</h3>
-            <div className="grid grid-cols-2 gap-3">
+          <section>
+            <h3 className="text-caps-label text-slate-300 mb-8 flex items-center">
+              <span className="w-6 h-6 rounded-full border border-slate-200 flex items-center justify-center text-[8px] mr-3">02</span>
+              Aesthetic Direction
+            </h3>
+            <div className="grid grid-cols-2 gap-4">
               {styles.map((s) => (
                 <button
                   key={s}
                   onClick={() => setStyle(s)}
-                  className={`px-4 py-4 rounded-2xl text-xs font-bold border transition-all uppercase tracking-tight ${
-                    style === s ? 'bg-indigo-600 text-white border-indigo-600 shadow-xl shadow-indigo-100' : 'bg-white text-slate-500 border-slate-100 hover:border-slate-300'
+                  className={`px-8 py-5 rounded-2xl text-[10px] font-bold border transition-all uppercase tracking-widest ${
+                    style === s ? 'bg-luxury-ink text-white border-luxury-ink shadow-luxury' : 'bg-white text-slate-400 border-luxury-stone/30 hover:border-brand/40'
                   }`}
                 >
                   {s}
@@ -141,25 +150,25 @@ export default function AIDesign() {
             <button 
               disabled={!preview || loading}
               onClick={handleRedesign}
-              className="w-full mt-8 bg-slate-900 text-white py-5 rounded-2xl font-bold flex items-center justify-center space-x-2 disabled:opacity-50 hover:bg-slate-800 transition-all shadow-xl shadow-slate-100 active:scale-95 uppercase tracking-widest text-xs"
+              className="w-full mt-12 btn-luxury bg-brand text-white border-brand hover:bg-luxury-ink shadow-luxury disabled:opacity-30"
             >
               {loading ? (
-                <>
-                  <RefreshCw className="animate-spin" size={20} />
-                  <span>Processing...</span>
-                </>
+                <div className="flex items-center justify-center gap-4">
+                  <RefreshCw className="animate-spin" size={16} />
+                  <span>Calibrating...</span>
+                </div>
               ) : (
-                <>
-                  <Sparkles size={20} />
-                  <span>Generate Redesign</span>
-                </>
+                <div className="flex items-center justify-center gap-4">
+                  <Sparkles size={16} />
+                  <span>Synthesize Concept</span>
+                </div>
               )}
             </button>
-          </div>
+          </section>
         </div>
 
         {/* Right: Results */}
-        <div className="relative min-h-[500px]">
+        <div className="lg:sticky lg:top-40 min-h-[400px] md:min-h-[600px] bg-luxury-paper rounded-[3rem] md:rounded-[4rem] p-4 border border-luxury-stone overflow-hidden">
           <AnimatePresence mode="wait">
             {!result ? (
               <motion.div 
@@ -167,62 +176,62 @@ export default function AIDesign() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="h-full bg-slate-50 rounded-[2.5rem] border border-slate-100 flex flex-col items-center justify-center text-center p-8 border-dashed"
+                className="h-full flex flex-col items-center justify-center text-center p-12 border-2 border-dashed border-luxury-stone/50 rounded-[3.5rem]"
               >
-                <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center mb-6 shadow-sm border border-slate-100">
+                <div className="w-24 h-24 bg-white/20 backdrop-blur-md rounded-[2.5rem] flex items-center justify-center mb-8 border border-white/30">
                   <ImageIcon size={32} className="text-slate-200" />
                 </div>
-                <h4 className="font-bold text-slate-900 mb-2 uppercase tracking-widest text-xs">Redesign Result</h4>
-                <p className="text-xs text-slate-400 max-w-xs leading-relaxed">Your AI-generated room concept will appear here after processing.</p>
+                <h4 className="text-caps-label text-slate-300 mb-4">Awaiting Synthesis</h4>
+                <p className="text-slate-400 italic serif text-sm max-w-xs">Your spatial reimagining will materialize here once the synthesis is complete.</p>
               </motion.div>
             ) : (
               <motion.div 
                 key="result"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="space-y-6"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="space-y-12"
               >
-                <div className="relative rounded-[2.5rem] overflow-hidden shadow-canvas border border-white p-2 bg-white bg-dots">
-                  <div className="aspect-[16/9] rounded-[2rem] overflow-hidden border border-slate-100">
-                    <img src={result.imageUrl} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                  </div>
-                  <div className="absolute top-8 left-8 bg-indigo-600/90 backdrop-blur-md px-4 py-1.5 rounded-full text-[10px] uppercase font-bold text-white tracking-widest border border-white/20">
-                    AI Concept
-                  </div>
+                <div className="relative aspect-[16/10] rounded-[3.5rem] overflow-hidden shadow-luxury bg-dots">
+                   <img src={result.imageUrl} className="w-full h-full object-cover transition-transform duration-[4s] hover:scale-105" referrerPolicy="no-referrer" />
+                   <div className="absolute top-10 left-10 py-3 px-6 bg-brand/90 backdrop-blur-xl border border-white/20 rounded-full">
+                      <span className="text-[8px] font-bold text-white uppercase tracking-[0.3em]">AI Synthesis v2.4</span>
+                   </div>
                 </div>
 
-                <div className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm">
-                   <h4 className="font-bold text-slate-400 mb-4 uppercase tracking-widest text-[10px]">Design Notes</h4>
-                   <p className="text-slate-600 leading-relaxed text-sm font-medium">
-                     {result.description || "The AI suggested a complete overhaul focusing on space maximization and light flow. New textures and materials have been chosen to complement the existing architecture."}
-                   </p>
+                <div className="px-10 pb-10 space-y-10">
+                   <div>
+                     <h4 className="text-caps-label text-brand mb-6">Design Interpretation</h4>
+                     <p className="text-luxury-ink leading-relaxed text-sm serif italic">
+                       {result.description}
+                     </p>
+                   </div>
                    
-                   <div className="mt-10 flex flex-col gap-4">
-                      <div className="flex gap-4">
+                   <div className="flex flex-col gap-6 pt-10 border-t border-luxury-stone">
+                      <div className="flex gap-6">
                         <button 
                           onClick={downloadHQ}
-                          className="flex-1 bg-slate-50 text-slate-900 py-4 rounded-xl text-xs font-bold border border-slate-100 hover:bg-slate-100 transition-colors flex items-center justify-center gap-2 uppercase tracking-tight"
+                          className="flex-1 text-[9px] font-bold uppercase tracking-[0.2em] py-5 border border-luxury-stone rounded-2xl hover:bg-brand hover:text-white hover:border-brand transition-all flex items-center justify-center gap-3"
                         >
-                          <Download size={16} /> Download HQ
+                          <Download size={14} /> Preserve HQ
                         </button>
                         <button 
                           onClick={shareDesign}
                           disabled={isSharing}
-                          className="flex-1 bg-indigo-50 text-indigo-600 py-4 rounded-xl text-xs font-bold border border-indigo-100 hover:bg-indigo-100 transition-colors flex items-center justify-center gap-2 uppercase tracking-tight"
+                          className="flex-1 text-[9px] font-bold uppercase tracking-[0.2em] py-5 bg-luxury-ink text-white rounded-2xl hover:bg-brand transition-all flex items-center justify-center gap-3"
                         >
-                          {isSharing ? <RefreshCw className="animate-spin" size={16} /> : <Share2 size={16} />}
-                          {shareUrl ? 'Link Copied' : 'Share Link'}
+                          {isSharing ? <RefreshCw className="animate-spin" size={14} /> : <Share2 size={14} />}
+                          {shareUrl ? 'Link Copied' : 'Curate to Public'}
                         </button>
                       </div>
                       
                       {shareUrl && (
                         <motion.div 
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="p-3 bg-indigo-50 rounded-xl border border-indigo-100 flex items-center justify-between"
+                          initial={{ opacity: 0, scale: 0.95 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          className="p-6 bg-brand/[0.03] rounded-2xl border border-brand/10 flex items-center justify-between"
                         >
-                           <span className="text-[10px] font-bold text-indigo-400 truncate max-w-[200px]">{shareUrl}</span>
-                           <Clipboard size={14} className="text-indigo-400" />
+                           <span className="text-[10px] font-medium text-brand truncate max-w-[250px]">{shareUrl}</span>
+                           <Clipboard size={14} className="text-brand opacity-40" />
                         </motion.div>
                       )}
                    </div>

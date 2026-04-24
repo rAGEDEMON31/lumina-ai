@@ -20,6 +20,7 @@ import {
   Check,
   RefreshCw,
   X,
+  Camera,
   Image as ImageIcon
 } from 'lucide-react';
 import { db } from '../lib/firebase';
@@ -28,10 +29,10 @@ import { useAuth } from '../context/AuthContext';
 import { Link, useParams } from 'react-router-dom';
 
 const DEFAULT_FURNITURE = [
-  { id: 'sofa-1', name: 'Modern Sofa', type: 'sofa', image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=400' },
-  { id: 'table-1', name: 'Oak Table', type: 'table', image: 'https://images.unsplash.com/photo-1530018607912-eff2df114f1e?auto=format&fit=crop&q=80&w=400' },
-  { id: 'chair-1', name: 'Eames Chair', type: 'chair', image: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?auto=format&fit=crop&q=80&w=400' },
-  { id: 'lamp-1', name: 'Floor Lamp', type: 'lamp', image: 'https://images.unsplash.com/photo-1534073828943-f801091bb18c?auto=format&fit=crop&q=80&w=400' },
+  { id: 'sofa-1', name: 'Velvet Sofa', type: 'sofa', image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=800' },
+  { id: 'table-1', name: 'Handcrafted Table', type: 'table', image: 'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&q=80&w=800' },
+  { id: 'chair-1', name: 'Nordic Chair', type: 'chair', image: 'https://images.unsplash.com/photo-1592078615290-033ee584e267?auto=format&fit=crop&q=80&w=800' },
+  { id: 'lamp-1', name: 'Minimalist Lamp', type: 'lamp', image: 'https://images.unsplash.com/photo-1507473885765-e6ed6576c0ad?auto=format&fit=crop&q=80&w=800' },
 ];
 
 export default function CanvasDesigner() {
@@ -48,6 +49,34 @@ export default function CanvasDesigner() {
   const [shareUrl, setShareUrl] = useState(null);
   const [projectId, setProjectId] = useState(null);
 
+  // Fetch initial relevant furniture items from Unsplash if key is present
+  useEffect(() => {
+    const fetchInitialCatalog = async () => {
+      const accessKey = import.meta.env.VITE_UNSPLASH_ACCESS_KEY;
+      if (!accessKey || accessKey === 'YOUR_KEY_HERE') return;
+
+      try {
+        const response = await fetch(
+          `https://api.unsplash.com/search/photos?query=luxury furniture interior&client_id=${accessKey}&per_page=12&orientation=squarish`
+        );
+        const data = await response.json();
+        if (data.results?.length > 0) {
+          const results = data.results.map(img => ({
+            id: img.id,
+            name: img.description?.split(' ').slice(0, 3).join(' ') || "Designer Piece",
+            type: 'curated',
+            image: img.urls.regular
+          }));
+          setSearchResults(results);
+        }
+      } catch (error) {
+        console.error("Initial catalog fetch failed", error);
+      }
+    };
+
+    fetchInitialCatalog();
+  }, []);
+
   useEffect(() => {
     const initCanvas = new fabric.Canvas(canvasRef.current, {
       width: containerRef.current.clientWidth,
@@ -63,6 +92,26 @@ export default function CanvasDesigner() {
 
     return () => initCanvas.dispose();
   }, []);
+
+  // Handle canvas responsiveness
+  useEffect(() => {
+    if (!canvas || !containerRef.current) return;
+
+    const resizeCanvas = () => {
+      window.requestAnimationFrame(() => {
+        if (!containerRef.current || !canvas) return;
+        const width = containerRef.current.clientWidth;
+        const height = window.innerWidth < 768 ? 400 : 600;
+        canvas.setDimensions({ width, height });
+        canvas.renderAll();
+      });
+    };
+
+    const resizeObserver = new ResizeObserver(resizeCanvas);
+    resizeObserver.observe(containerRef.current);
+
+    return () => resizeObserver.disconnect();
+  }, [canvas]);
 
   const searchFurniture = async (e) => {
     e.preventDefault();
@@ -81,7 +130,7 @@ export default function CanvasDesigner() {
     setIsSearching(true);
     try {
       const response = await fetch(
-        `https://api.unsplash.com/search/photos?query=${query} furniture transparent&client_id=${accessKey}&per_page=12`
+        `https://api.unsplash.com/search/photos?query=${query} furniture isolation&client_id=${accessKey}&per_page=16&orientation=squarish`
       );
       const data = await response.json();
       const results = data.results.map(img => ({
@@ -206,10 +255,16 @@ export default function CanvasDesigner() {
     link.click();
   };
 
+  const [isCatalogOpen, setIsCatalogOpen] = useState(true);
+  const [isPropertiesOpen, setIsPropertiesOpen] = useState(false);
+
   return (
-    <div className="flex h-[calc(100vh-64px)] overflow-hidden bg-slate-50">
+    <div className="flex flex-col lg:flex-row h-auto lg:h-[calc(100vh-96px)] overflow-hidden lg:overflow-hidden bg-slate-50">
       {/* Sidebar - Assets */}
-      <div className="w-80 bg-white border-r border-slate-100 flex flex-col shadow-sm">
+      <div className={`
+        ${isCatalogOpen ? 'flex' : 'hidden lg:flex'} 
+        w-full lg:w-80 h-[40vh] lg:h-full bg-white border-r border-slate-100 flex-col shadow-sm z-20 transition-all
+      `}>
         <div className="p-6 border-b border-slate-50">
           <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center">
             Furniture Catalog
@@ -239,7 +294,16 @@ export default function CanvasDesigner() {
                 className="group relative bg-white p-2 rounded-2xl border border-slate-100 hover:border-indigo-200 transition-all text-left shadow-sm"
               >
                 <div className="aspect-square bg-slate-50 rounded-xl flex items-center justify-center p-2 mb-2 overflow-hidden border border-slate-50">
-                  <img src={item.image} alt={item.name} className="w-full h-full object-contain" referrerPolicy="no-referrer" />
+                  <img 
+                    src={item.image} 
+                    alt={item.name} 
+                    className="w-full h-full object-contain" 
+                    referrerPolicy="no-referrer"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&q=80&w=400';
+                    }}
+                  />
                 </div>
                 <div className="px-1">
                   <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none truncate">{item.type}</p>
@@ -252,15 +316,35 @@ export default function CanvasDesigner() {
       </div>
 
       {/* Main Canvas Area */}
-      <div className="flex-1 relative flex flex-col overflow-hidden" ref={containerRef}>
+      <div className="flex-1 relative flex flex-col overflow-hidden min-h-[400px] lg:min-h-0" ref={containerRef}>
+        {/* Mobile Toggle Buttons */}
+        <div className="lg:hidden flex border-b border-luxury-stone/10 bg-white">
+          <button 
+            onClick={() => { setIsCatalogOpen(!isCatalogOpen); setIsPropertiesOpen(false); }}
+            className={`flex-1 py-4 text-[9px] font-bold uppercase tracking-widest ${isCatalogOpen ? 'text-brand border-b-2 border-brand' : 'text-slate-400'}`}
+          >
+            Catalog
+          </button>
+          <button 
+            onClick={() => { setIsPropertiesOpen(!isPropertiesOpen); setIsCatalogOpen(false); }}
+            className={`flex-1 py-4 text-[9px] font-bold uppercase tracking-widest ${isPropertiesOpen ? 'text-brand border-b-2 border-brand' : 'text-slate-400'}`}
+          >
+            Properties
+          </button>
+        </div>
+
         {/* Toolbar */}
-        <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10 bg-white/90 backdrop-blur-md px-6 py-3 rounded-2xl border border-slate-100 shadow-xl flex items-center space-x-6">
+        <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10 bg-white/90 backdrop-blur-md px-4 md:px-6 py-3 rounded-2xl border border-slate-100 shadow-xl flex items-center space-x-4 md:space-x-6 w-[90%] md:w-auto overflow-x-auto hide-scrollbar">
           <div className="flex items-center space-x-2 text-[10px] font-bold text-slate-400 uppercase">
              <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span> {projectId ? 'Saved' : 'Auto-save Ready'}
           </div>
           <div className="w-px h-4 bg-slate-100" />
           
           <div className="flex items-center space-x-4">
+            <Link to="/ar-view" className="flex items-center space-x-2 text-[10px] uppercase tracking-widest font-bold text-slate-500 hover:text-indigo-600 transition-all">
+              <Camera size={14} /> <span>AR View</span>
+            </Link>
+            <div className="w-px h-4 bg-slate-100" />
             <button onClick={saveProject} disabled={isSaving} className="flex items-center space-x-2 text-[10px] uppercase tracking-widest font-bold text-slate-500 hover:text-indigo-600 transition-all">
               {isSaving ? <RefreshCw className="animate-spin" size={14} /> : <Save size={14} />} 
               <span>{isSaving ? 'Saving...' : 'Save'}</span>
@@ -299,7 +383,11 @@ export default function CanvasDesigner() {
       </div>
 
       {/* Right Sidebar - Properties */}
-      <div className="w-72 bg-white border-l border-slate-100 p-6 flex flex-col shadow-sm">
+      <div className={`
+        ${isPropertiesOpen ? 'flex' : 'hidden'} 
+        ${selectedObject ? 'lg:flex' : 'lg:hidden'}
+        w-full lg:w-72 h-[40vh] lg:h-full bg-white border-l border-slate-100 p-6 flex-col shadow-sm z-20 transition-all
+      `}>
         <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">Object Details</h3>
         
         {selectedObject ? (

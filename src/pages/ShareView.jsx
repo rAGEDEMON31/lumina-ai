@@ -33,14 +33,21 @@ export default function ShareView() {
     fetchShared();
   }, [shareId]);
 
+  const containerRef = useRef(null);
+
   useEffect(() => {
-    if (data?.type === 'canvas' && canvasRef.current) {
+    if (data?.type === 'canvas' && canvasRef.current && containerRef.current) {
+      const containerWidth = containerRef.current.clientWidth;
+      const scale = Math.min(containerWidth / 800, 1);
+      
       const initCanvas = new fabric.StaticCanvas(canvasRef.current, {
-         width: 800,
-         height: 600,
+         width: 800 * scale,
+         height: 600 * scale,
          backgroundColor: '#ffffff'
       });
+
       initCanvas.loadFromJSON(JSON.parse(data.canvasData), () => {
+         initCanvas.setZoom(scale);
          initCanvas.renderAll();
       });
       return () => initCanvas.dispose();
@@ -88,7 +95,7 @@ export default function ShareView() {
             </Link>
           </div>
 
-          <div className="p-4 bg-slate-50 flex items-center justify-center min-h-[400px]">
+          <div className="p-4 bg-slate-50 flex items-center justify-center min-h-[300px] md:min-h-[400px]" ref={containerRef}>
              {isCanvas ? (
                <div className="bg-white shadow-xl rounded-2xl border border-slate-200 overflow-hidden">
                   <canvas ref={canvasRef} />
